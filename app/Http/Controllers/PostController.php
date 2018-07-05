@@ -1,39 +1,46 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Post;
-use App\Like;
-use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
+use App\Like;
+use App\Post;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-class PostController extends Controller
-{
-    public function addpost(Request $request, Post $post){
-    	//dd($request->toArray());
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-    	/*
-      $this->validate(request(),[
-       'url'=>'image|mimes:jpg,png,gif|max:2048'
-        ]);
-        */
-    $img_name=time() . '.' . $request->url->getClientOriginalExtension(); 
+class PostController extends Controller
+
+{
+  public function uploadImg(Request $request) {
+      $img = $request['avatar'];
+      $img_name=time() . '.' . $img->getClientOriginalExtension();
+
+      Storage::put($img_name, file_get_contents($img->getRealPath()));
+      // Toda
+      // 1 - get link
+      // 2 - return link
+
+
+  }
+
+  public function addpost(Request $request, Post $post){
+
+
 
     	$post->create([
-		'name' =>$request->name ,
-		'age' =>$request->age,
-		'birth' =>$request->birth,
-		'city' =>$request->city,
-		'status' =>$request->status,
-		'description' =>$request->description,
-		'url' => $img_name
+        'name' =>$request->name ,
+        'age' =>$request->age,
+        'birth' =>$request->birth,
+        'city' =>$request->city,
+        'status' =>$request->status,
+        'description' =>$request->description,
+        'url' => $request->photoUrl,
+  	]);
 
-		]);
-		//upload image to server 
-        $img_name=base64_decode($img_name);
-		$request->url->move(public_path('upload'),$img_name );
 
-		$id = $post->max('id'); // get record id 
+		$id = $post->max('id'); // get record id
 		$query = "select name, age, birth,city,status,description,url from post where id = $id";
 		$data = DB::select($query);
 
@@ -46,23 +53,23 @@ class PostController extends Controller
         //creat a new client from gruzzle
          $client = new Client([
                 'timeout'  => 5.0,
-            ]); 
-         $response = $client->post('http//8cfe8f03.ngrok.io/api/match', 
+            ]);
+         $response = $client->post('http//8cfe8f03.ngrok.io/api/match',
                 ['json' => [
                     "post_id" =>$post->id,
                     "img_path" => $post->url
                 ]]);
-        
+
          return response()->json($response,200);
          $data=json_decode($response);
 
     }
 
-    // noti function 
+    // noti function
 
 
     public function notification(){
-    	
+
     }
 
 
@@ -89,12 +96,12 @@ public function likes(Request $request){
         elseif ($like->like==1) {
            DB::table('likes')->where('post_id',$post_id)->where('user_id',$user_id)->delete();
            $is_like=0;
-        } 
+        }
         elseif ($like->like==0) {
            DB::table('likes')->where('post_id',$post_id)->where('user_id',$user_id)->update( );
            $is_like=1;
         }
-         
+
          $response=array('is_like'=>$is_like);
          return response()->json($response,200);
 
@@ -108,7 +115,7 @@ public function likes(Request $request){
        'url'=>'image|mimes:jpg,png,gif|max:2048'
         ]);
         */
-    $img_name=time() . '.' . $request->url->getClientOriginalExtension(); 
+    $img_name=time() . '.' . $request->url->getClientOriginalExtension();
     $post = post::find(1);
 
     // $post=new post;
@@ -118,5 +125,5 @@ public function likes(Request $request){
 
    return response()->json(['post'=>$post],201);
    }
-   
+
 }

@@ -13,14 +13,17 @@ use App\User;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization');
+
 
 Route::post('/addPost','PostController@addpost');
 Route::post('/clients','ClientController@core');
 Route::post('/getnotifications','PostController@notification');
 Route::post('/likes','PostController@likes');
-Route::get('/home','PostController@getpost'
-);
-
+Route::get('/getposts','PostController@getpost');
+Route::post('/upload','PostController@uploadImg');
 
 // for test
 Route::post('/addComment','CommentController@addComment');
