@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use File;
 
 class PostController extends Controller
 
@@ -21,7 +22,20 @@ class PostController extends Controller
       // Toda
       // 1 - get link
       // 2 - return link
+      $path = storage_path('public/' . $img_name);
 
+    if (!File::exists($path)) {
+        abort(404);
+    }
+    else{
+       $file = File::get($path);
+    $type = File::mimeType($path);
+    $response = Response::make($file, 200);
+
+    return response()->json($response,200);
+
+
+}
 
   }
 
