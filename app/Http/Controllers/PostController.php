@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Intervention\Image\ImageManagerStatic as Image;
 use File;
 
 class PostController extends Controller
@@ -58,23 +59,22 @@ class PostController extends Controller
 		$data = Post::find($id);
 
 		// $record = json_encode($data);
-		return response()->json([
-            "error"=>false,
-            "data"=>$data,
-        ]);
+		//return response()->json([
+           // "error"=>false,
+           // "data"=>$data,
+      //  ]);
         //send http requests to deep learning algrith
         //creat a new client from gruzzle
          $client = new Client([
                 'timeout'  => 5.0,
             ]);
-         $response = $client->post('http//8cfe8f03.ngrok.io/api/match',
+         $response = $client->post('http://1b025780.ngrok.io/api/match',
                 ['json' => [
                     "post_id" =>$post->id,
-                    "img_path" => $post->url
+                    "img_path" => $post->photoUrl
                 ]]);
 
          return response()->json($response,200);
-         $data=json_decode($response);
 
     }
 
@@ -120,9 +120,9 @@ public function likes(Request $request){
 
     }
 
-    public function addpostandroid(Request $request , Post $post){
-
-$post->create([
+   
+/*
+    $post->create([
         'name' =>$request->name ,
         'age' =>$request->age,
         'birth' =>$request->birth,
@@ -131,11 +131,45 @@ $post->create([
         'description' =>$request->description,
         'photoUrl' => $request->photoUrl,
     ]);
-    
-
-
+      $img2 = $request['photoUrl'];
+      $img_name2=time() . '.' . $img2->getClientOriginalExtension();
+      Storage::put($img_name2, 
+        base64_encode(file_get_contents($img2->getRealPath())));
+    if (!Storage::disk('local')->exists($img_name2)) {
+        abort(404);
     }
+    else{
+      $path2 = Storage::disk('local')->url($img_name2);
+    return response()->json([
+      "error" => false,
+      "path" => $path2
+    ]);*/
+    
+  public function addpostandroid(Request $request , Post $post){
 
+
+   $image = $request['avatar'];
+   // $type = pathinfo($image, PATHINFO_EXTENSTION);
+   $photo = base64_decode($image);
+    Storage::put($image,file_get_contents($photo->getRealPath()));
+       
+      if (!Storage::disk('local')->exists($image)) {
+        abort(404);
+    }
+    else{
+      $path = Storage::disk('local')->url($image);
+       return response()->json([
+      "error" => false,
+      "path" => $path
+    ]);
+
+
+    
+     
     
 
 }
+}
+}
+
+
