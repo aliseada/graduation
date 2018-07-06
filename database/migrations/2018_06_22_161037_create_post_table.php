@@ -22,6 +22,7 @@ class CreatePostTable extends Migration
             $table->string('city');
             $table->string('status');
             $table->text('description');
+            $table->string('photoUrl');
             $table->timestamps();
         }); 
     }

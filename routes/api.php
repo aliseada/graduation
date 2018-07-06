@@ -19,6 +19,7 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Author
 
 
 Route::post('/addPost','PostController@addpost');
+Route::post('/addPost/android','PostController@addpostandroid');
 Route::post('/clients','ClientController@core');
 Route::post('/getnotifications','PostController@notification');
 Route::post('/likes','PostController@likes');

@@ -17,30 +17,30 @@ class PostController extends Controller
   public function uploadImg(Request $request) {
       $img = $request['avatar'];
       $img_name=time() . '.' . $img->getClientOriginalExtension();
-
       Storage::put($img_name, file_get_contents($img->getRealPath()));
       // Toda
       // 1 - get link
       // 2 - return link
-      $path = storage_path('public/' . $img_name);
+     
 
-    if (!File::exists($path)) {
+    if (!Storage::disk('local')->exists($img_name)) {
         abort(404);
     }
     else{
-       $file = File::get($path);
-    $type = File::mimeType($path);
-    $response = Response::make($file, 200);
-
-    return response()->json($response,200);
+      $path = Storage::disk('local')->url($img_name);
 
 
-}
+    return response()->json([
+      "error" => false,
+      "path" => $path
+    ]);
+
+
+  }
 
   }
 
   public function addpost(Request $request, Post $post){
-
 
 
     	$post->create([
@@ -50,13 +50,12 @@ class PostController extends Controller
         'city' =>$request->city,
         'status' =>$request->status,
         'description' =>$request->description,
-        'url' => $request->photoUrl,
+        'photoUrl' => $request->photoUrl,
   	]);
 
 
 		$id = $post->max('id'); // get record id
-		$query = "select name, age, birth,city,status,description,url from post where id = $id";
-		$data = DB::select($query);
+		$data = Post::find($id);
 
 		// $record = json_encode($data);
 		return response()->json([
@@ -121,23 +120,22 @@ public function likes(Request $request){
 
     }
 
+    public function addpostandroid(Request $request , Post $post){
+
+$post->create([
+        'name' =>$request->name ,
+        'age' =>$request->age,
+        'birth' =>$request->birth,
+        'city' =>$request->city,
+        'status' =>$request->status,
+        'description' =>$request->description,
+        'photoUrl' => $request->photoUrl,
+    ]);
+    
 
 
-    public function store(Request $request){
-    	/*
-      $this->validate(request(),[
-       'url'=>'image|mimes:jpg,png,gif|max:2048'
-        ]);
-        */
-    $img_name=time() . '.' . $request->url->getClientOriginalExtension();
-    $post = post::find(1);
+    }
 
-    // $post=new post;
-     $post->url=$img_name;
-     $post->save();
-     $request->url->move(public_path('upload'),$img_name );
-
-   return response()->json(['post'=>$post],201);
-   }
+    
 
 }

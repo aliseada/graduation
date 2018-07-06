@@ -9,7 +9,7 @@ class Post extends Model
 	protected $table = 'post';
      protected $fillable=[
    'name','age','birth','city','status',
-    'description','url'
+    'description','photoUrl'
    ];
 
    
