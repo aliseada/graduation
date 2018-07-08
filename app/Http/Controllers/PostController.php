@@ -21,7 +21,7 @@ class PostController extends Controller
         Storage::disk('public')
             ->put($this->buildFilePath($img_name, 'images'), file_get_contents($img->getRealPath()));
 
-        $path =  asset("storage/images/$img_name");
+        $path =  $photoUrl = $this->getImageUrl($img_name);
 
         return response()->json([
             "error" => false,
@@ -154,7 +154,7 @@ class PostController extends Controller
         $manager = new ImageManager(array('driver' => 'gd'));
         $image_manager = $manager->make(base64_encode(file_get_contents($image->getRealPath())));
         $image_manager->save(storage_path('app/public/images/' . $name));
-        $photoUrl = asset("storage/images/$name");//new
+        $photoUrl = $this->getImageUrl($name);//new
 
         $postId = Post::insertGetId([
             'name' => $request->name,
@@ -204,6 +204,11 @@ class PostController extends Controller
         //$post=Post::where('post_id',$this->$record->$postId,'img_path',$this->$record->photoUrl)->get();
         //  return $post;
         return $this->$response;
+    }
+
+    public function getImageUrl($image)
+    {
+        return asset("storage/images/$image");
     }
 }
 

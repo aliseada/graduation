@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3da7104d50f52bf34864ff4888214d23",
+    "content-hash": "b1eb5c6dabcb95f89a40be3b1ac15253",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -3071,7 +3071,7 @@
             ],
             "authors": [
                 {
-                    "name": "Pádraic Brady",
+                    "name": "Padraic Brady",
                     "email": "padraic.brady@gmail.com",
                     "homepage": "http://blog.astrumfutura.com"
                 },
