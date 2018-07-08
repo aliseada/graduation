@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Intervention\Image\ImageManagerStatic as Image;
 use File;
@@ -17,17 +18,21 @@ class PostController extends Controller
     {
         $img = $request['avatar'];
         $img_name = time() . '.' . $img->getClientOriginalExtension();
-        Storage::disk('local')
-            ->put($this->buildFilePath($img_name, 'public'), file_get_contents($img->getRealPath()));
+        Storage::disk('public')
+            ->put($this->buildFilePath($img_name, 'images'), file_get_contents($img->getRealPath()));
 
-        $path = Storage::disk('local')->url($img_name);
+        $path =  asset("storage/images/$img_name");
 
         return response()->json([
             "error" => false,
-            "path" => url($path)
+            "path" => $path
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addpost(Request $request)
     {
         $postId = Post::insertGetId([
@@ -101,17 +106,55 @@ class PostController extends Controller
     }
 
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+//    public function addpostandroid(Request $request)
+//    {
+//        $extension = $this->getImageExtension($request->base64);
+//
+//        $name = str_random(32) . '.' . $extension;
+//        Storage::disk('public')->put($this->buildFilePath($name, 'images'),
+//            Image::make(base64_decode($request->base64))->stream()->__toString()
+//        );
+//
+//        $photoUrl = asset("storage/images/$name");
+//
+//        $postId = Post::insertGetId([
+//            'name' => $request->name,
+//            'age' => $request->age,
+//            'birth' => $request->birth,
+//            'city' => $request->city,
+//            'status' => $request->status,
+//            'description' => $request->description,
+//            'photoUrl' => $photoUrl
+//        ]);
+//
+//        return response()->json([
+//            'error' => false,
+//            'message' => 'Post created successfully',
+//            'data' => [
+//                'postId' => $postId,
+//                'photoUrl' => $photoUrl,
+//            ],
+//        ]);
+//    }
     public function addpostandroid(Request $request)
     {
-        $extension = $this->getImageExtension($request->base64);
+        $image = $request->file('image');
+//        $extension = $this->getImageExtension($image->getClientOriginalName()); //old
+        $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);//new
+        $image_name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);//new
 
-        $name = str_random(32) . '.' . $extension;
-        Storage::disk('local')->put($this->buildFilePath($name, 'public'),
-            Image::make(base64_decode($request->base64))->stream()->__toString()
-        );
-
-        $photoUrl = url(Storage::disk('local')->url($name));
+        $name = str_replace(' ', '_', strtolower($image_name)) . str_random(5) . '.' . $extension;
+//        Storage::disk('public')->put($this->buildFilePath($name, 'images'),//old
+//            Image::make(base64_decode($request->base64))->stream()->__toString()
+//        );
+        $manager = new ImageManager(array('driver' => 'gd'));
+        $image_manager = $manager->make(base64_encode(file_get_contents($image->getRealPath())));
+        $image_manager->save(storage_path('app/public/images/' . $name));
+        $photoUrl = asset("storage/images/$name");//new
 
         $postId = Post::insertGetId([
             'name' => $request->name,
@@ -132,7 +175,6 @@ class PostController extends Controller
             ],
         ]);
     }
-
     protected function buildFilePath($name, $folder)
     {
         return $folder . '/' . $name;
