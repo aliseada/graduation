@@ -19,14 +19,14 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Author
 
 
 Route::post('/addPost','PostController@addpost');
-Route::post('/shimaa','PostController@elabd');
+Route::post('/Core','PostController@core');
+Route::get('/Check','PostController@getpostcheck');
 Route::post('/addPost/android','PostController@addpostandroid');
 Route::post('/clients','ClientController@core');
 Route::post('/getnotifications','PostController@notification');
 Route::post('/likes','PostController@likes');
 Route::get('/getposts','PostController@getpost');
 Route::post('/upload','PostController@uploadImg');
-
 // for test
 Route::post('/addComment','CommentController@addComment');
 Route::get('/postComments/{post_id}','CommentController@postComments');

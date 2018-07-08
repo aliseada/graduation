@@ -54,7 +54,7 @@ class PostController extends Controller
         'photoUrl' => $request->photoUrl,
   	]);
 
-
+     
 		$id = $post->max('id'); // get record id
 		$data = Post::find($id);
 
@@ -65,7 +65,7 @@ class PostController extends Controller
       //  ]);
         //send http requests to deep learning algrith
         //creat a new client from gruzzle
-         $client = new Client([
+       /*  $client = new Client([
                 'timeout'  => 5.0,
             ]);
          $response = $client->post('http://1b025780.ngrok.io/api/match',
@@ -74,7 +74,7 @@ class PostController extends Controller
                     "img_path" => $post->photoUrl
                 ]]);
 
-         return response()->json($response,200);
+         return response()->json($response,200);*/
 
     }
 
@@ -156,7 +156,6 @@ public function likes(Request $request){
         'description' =>$request->description,
         'photoUrl' => $request->photoUrl,
     ]);
-     
 
    $image_data = $request->file('photoUrl');
    // $type = pathinfo($image, PATHINFO_EXTENSTION);
@@ -164,20 +163,17 @@ public function likes(Request $request){
     @list($type, $image_data) = explode(';', $image_data);
      @list(, $image_data) = explode(',', $image_data);
 //photo = base64_decode($image_data);
-   // 
-
+  
     //Storage::put('',file_get_contents($image_data->getRealPath()));
       if($image_data!=""){ // storing image in storage/app/public Folder 
-          \Storage::disk('public')->put($file_name,base64_decode($image_data),file_get_contents($image_data->getRealPath())); 
+          Storage::disk('local')->put($file_name,base64_decode($image_data),file_get_contents($image_data->getRealPath())); 
     } 
         
-      if (!Storage::disk('public')->exists($image_data)) {
+      if (!Storage::disk('local')->exists($image_data)) {
        // abort(404);
-             
-
     }
     else{
-      $path = Storage::disk('public')->url($image_data);
+      $path = Storage::disk('local')->url($image_data);
       
        /*return response()->json([
       "error" => false,
@@ -192,28 +188,31 @@ public function likes(Request $request){
     ]);
 
 
-    
-     
-    
-
+  
 }
 }
- public function elabd(Request $request , Post $post){
 
-
-
-   $client = new Client([
-                'timeout'  => 50000000000.0,
-            ]);
-
-         $response = $client->post('http://192.168.10.23:5000/api/test',
-                ['json' => [
-                    "post_id" =>$post->id,
-                    "img_path" => $post->photoUrl
+  public function core(Request $request , Post $post){
+   $client = new Client();
+   $response=$client->post('http://45a2b937.ngrok.io/api/match', [
+              'json' => [
+                    "post_id" =>2,
+                    "img_path" => "6.jpg"
                 ]]);
+  // $response=$request->send();
+   //$record=json_decode($response);
+    
+  return $response ;
+//return Redirect::to('api/Check/'.$response);
 
-         return response()->json($response,200);
+ }
 
+ public function getpostcheck(Request $request , Post $post){
+      //  $this->core();
+
+        //$post=Post::where('post_id',$this->$record->$postId,'img_path',$this->$record->photoUrl)->get();
+      //  return $post;
+  return $this->$response;
  }
 }
 
