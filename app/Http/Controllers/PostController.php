@@ -28,7 +28,7 @@ class PostController extends Controller
      */
     public function addPost(Request $request)
     {
-        $this->uploadImg($request);
+        $upload = $this->uploadImg($request);
         $postId = Post::insertGetId([
             'name' => $request->name,
             'age' => $request->age,
@@ -36,7 +36,7 @@ class PostController extends Controller
             'city' => $request->city,
             'status' => $request->status,
             'description' => $request->description,
-            'photoUrl' => $request->photoUrl
+            'photoUrl' => json_decode($upload->getContent())->path
         ]);
 
         return response()->json([
@@ -44,19 +44,22 @@ class PostController extends Controller
             'message' => 'Post created successfully',
             'data' => [
                 'postId' => $postId,
-                'photoUrl' => $request->photoUrl,
+                'photoUrl' => json_decode($upload->getContent())->path,
             ]
         ]);
     }
 
     public function uploadImg(Request $request)
     {
-        $img = $request['avatar'];
-        $img_name = time() . '.' . $img->getClientOriginalExtension();
-        Storage::disk('public')
-            ->put($this->buildFilePath($img_name, 'images'), file_get_contents($img->getRealPath()));
+        $image = $request->file('photoUrl');
+        $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);//new
+        $image_name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);//new
 
-        $path = $photoUrl = $this->getImageUrl($img_name);
+        $name = str_replace(' ', '_', strtolower($image_name)) . str_random(5) . '.' . $extension;
+        Storage::disk('public')
+            ->put($this->buildFilePath($name, 'images'), file_get_contents($image->getRealPath()));
+
+        $path = $photoUrl = $this->getImageUrl($name);
 
         return response()->json([
             "error" => false,
@@ -81,41 +84,6 @@ class PostController extends Controller
 
     }
 
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-//    public function addpostandroid(Request $request)
-//    {
-//        $extension = $this->getImageExtension($request->base64);
-//
-//        $name = str_random(32) . '.' . $extension;
-//        Storage::disk('public')->put($this->buildFilePath($name, 'images'),
-//            Image::make(base64_decode($request->base64))->stream()->__toString()
-//        );
-//
-//        $photoUrl = asset("storage/images/$name");
-//
-//        $postId = Post::insertGetId([
-//            'name' => $request->name,
-//            'age' => $request->age,
-//            'birth' => $request->birth,
-//            'city' => $request->city,
-//            'status' => $request->status,
-//            'description' => $request->description,
-//            'photoUrl' => $photoUrl
-//        ]);
-//
-//        return response()->json([
-//            'error' => false,
-//            'message' => 'Post created successfully',
-//            'data' => [
-//                'postId' => $postId,
-//                'photoUrl' => $photoUrl,
-//            ],
-//        ]);
-//    }
     public function getPost()
     {
         $post = Post::all();
@@ -203,7 +171,7 @@ class PostController extends Controller
             if ($post != null)
                 $this->posts[] = $post;
         }
-        return ['response' => $data, 'posts' => $this->posts];
+        return $this->posts;
 
     }
 
