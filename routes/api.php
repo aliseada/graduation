@@ -18,14 +18,14 @@ header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization');
 
 
-Route::post('/addPost','PostController@addpost');
+Route::post('/addPost','PostController@addPost');
 Route::post('/Core','PostController@core');
-Route::get('/Check','PostController@getpostcheck');
-Route::post('/addPost/android','PostController@addpostandroid');
+Route::get('/Check','PostController@getPostCheck');
+Route::post('/addPost/android','PostController@addPostAndroid');
 Route::post('/clients','ClientController@core');
 Route::post('/getnotifications','PostController@notification');
 Route::post('/likes','PostController@likes');
-Route::get('/getposts','PostController@getpost');
+Route::get('/getposts','PostController@getPost');
 Route::post('/upload','PostController@uploadImg');
 // for test
 Route::post('/addComment','CommentController@addComment');
